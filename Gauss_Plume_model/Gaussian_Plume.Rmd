@@ -1,0 +1,96 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Neccesarry package:
+
+install.packages("remotes")
+remotes::install_github("holstius/plume")
+
+```{r}
+require(plume)
+Q <- 50.0 # emission rate, g/s
+H <- 10.0 # source height, m
+u <- 2.0 # wind speed, m/s
+plume <- GaussianPlume(Q, H, u, sigma=PasquillGifford('D'))
+
+ resolution <- 20
+locations <- expand.grid(
+  x = seq(20, 1500, by=resolution),
+  y = seq(-500, 500, by=resolution),
+  z = 1.8)
+
+system.time(gm3 <- plume(locations))
+cells <- data.frame(locations, mgm3 = gm3 * 1e3)
+
+require(ggplot2)
+p <- ggplot(subset(cells, mgm3 > 0.1), aes(x, y)) +
+  geom_tile(aes(alpha=mgm3), fill='red') +
+  scale_alpha(expression(mg/m^3), range=c(0, 1))
+show(p + xlim(c(0, 1500)) + ylim(c(-250, 250)) + coord_equal())
+```
+
+
+
+Take a car that has 25 mpg and is going a constant 25 mph
+Average CO2 Emissions from a gallon of gasoline: 8,887 grams CO2/ gallon
+1 hour = 1 gallon = 8,887 grams CO2/ gallon
+1 hour = 8,887 grams CO2/ hour
+1 second = 24.6861 grams CO2/second
+
+```{r}
+require(plume)
+Q <- 24.6861 # emission rate, g/s
+H <- 5 # source height, m
+u <- 4.23 # wind speed, m/s
+plume <- GaussianPlume(Q, H, u, sigma=PasquillGifford('C'))
+
+
+resolution <- 0.0762
+locations <- expand.grid(
+  x = seq(1, 200, by=resolution),
+  y = seq(-100, 100, by=resolution),
+  z = .054)
+
+
+system.time(gm3 <- plume(locations))
+cells <- data.frame(locations, mgm3 = gm3 * 1e3)
+
+require(ggplot2)
+p <- ggplot(subset(cells, mgm3 > 0.1), aes(x, y, z)) +
+  geom_tile(aes(alpha=mgm3), fill='red') +
+  scale_alpha(expression(mg/m^3), range=c(0, 1))
+show(p + xlim(c(-1, 200)) + ylim(c(-100, 100)) + coord_equal())
+```
+
+
+236.125 lb/hour of Nox from a fluestack
+107104.498 g/hour
+297.51 g/s
+
+
+```{r}
+require(plume)
+Q <- 297.51 # emission rate, g/s
+H <- 420 # source height, m
+u <- 4.23 # wind speed, m/s
+plume <- GaussianPlume(Q, H, u, sigma=PasquillGifford('C'))
+
+resolution <- 30
+locations <- expand.grid(
+  x = seq(30, 750, by=resolution),
+  y = seq(-500, 500, by=resolution),
+  z = 420)
+
+system.time(gm3 <- plume(locations))
+cells <- data.frame(locations, mgm3 = gm3 * 1e3)
+
+require(ggplot2)
+p <- ggplot(subset(cells, mgm3 > 0.1), aes(x, y)) +
+  geom_tile(aes(alpha=mgm3), fill='red') +
+  scale_alpha(expression(mg/m^3), range=c(0, 1))
+show(p + xlim(c(0, 750)) + ylim(c(-100, 100)) + coord_equal())
+```
+
+
